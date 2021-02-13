@@ -10,9 +10,9 @@ Whenever you're building new feature, you probably want to deploy them as fast a
 
 In the past couple of weeks I deployed a new feature called _Custom domain_. This feature allowed users of Simple Analytics to bypass ad-blockers and tracking blockers. I believe people should be allowed to block tracking, so Simple Analytics respects the "Do Not Track" setting of the browser. Unfortunately, Simple Analytics has been added to some privacy block lists - which I think is not fair since we take privacy very seriously (moved the servers to a very privacy friendly country: Iceland; encrypted our database server; It removes data from the database when a user deletes something; allowing people to download their data). So the new feature was very welcomed. Once it was deployed, a few users started using it.
 
-<img class="limit-height" src="/images/bug.svg" alt="">
+<img loading="lazy" class="limit-height" src="/images/bug.svg" alt="">
 
-Today I found a bug (thankfully by myself) when using the _Custom domain_-feature where the JavaScript was loading, but the API-call asked for a password. I looked up one of my customers' websites ([excuseme.wtf](https://excuseme.wtf/?ref=blog.simpleanalytics.io)) who I know was using the _Custom domain_-feature. I checked [his stats](https://simpleanalytics.io/excuseme.wtf) and was horrified to find out there weren't any visits for the last week. Immediately I started digging into my servers, looking for clues.
+Today I found a bug (thankfully by myself) when using the _Custom domain_-feature where the JavaScript was loading, but the API-call asked for a password. I looked up one of my customers' websites ([excuseme.wtf](https://excuseme.wtf/?ref={{ site.hostname }})) who I know was using the _Custom domain_-feature. I checked [his stats](https://simpleanalytics.com/excuseme.wtf) and was horrified to find out there weren't any visits for the last week. Immediately I started digging into my servers, looking for clues.
 
 ### Current setup
 
@@ -26,15 +26,15 @@ I decided to install a new monitoring app to the Queue-server, this way I could 
 
 Luckily, I have a directory/records of NGINX logs, from where I can retrieve most of the lost request back. These logs contained less information at the time and only recorded the time, URL, and user agent.
 
-<img class="limit-height" src="/images/server.svg" alt="">
+<img loading="lazy" class="limit-height" src="/images/server.svg" alt="">
 
 ### What did I do to prevent this from happening again?
 
 While this bug didn't affect a lot of customers and didn't have a significant amount of data loss, I want to do everything I can to prevent this from happening in the future. The bug was created by adding another app to the same server which didn't have any server directive being defined as the default server. NGINX then tries it's best to select a server as the default server and sends the requests to the app defined in that server.
 
-Firstly, I added the default server to the listen directive for port 80 and 443 in the main app ([nginx docs](https://nginx.org/en/docs/http/server_names.html#miscellaneous_names)). The main app on that server was the external app that manages the certificates for the _Custom domain_-feature and replies with a script and API endpoint does not use Simple Analytics URLs which makes it hard to block. 
+Firstly, I added the default server to the listen directive for port 80 and 443 in the main app ([nginx docs](https://nginx.org/en/docs/http/server_names.html#miscellaneous_names)). The main app on that server was the external app that manages the certificates for the _Custom domain_-feature and replies with a script and API endpoint does not use Simple Analytics URLs which makes it hard to block.
 
-Secondly, I increased the log history to 90 days so I can recover visits for future issues. The Queue-server and the Main-server now logs every failed request by anyone. This means every request that returns a TTP code `5xx` or `4xx` will be saved in the logs and can be recovered from it. It will require quite some work to get it done if needed, but it means no data loss.
+Secondly, I increased the log history to 90 days so I can recover visits for future issues. The Queue-server and the Main-server now logs every failed request by anyone. This means every request that returns a HTTP code `5xx` or `4xx` will be saved in the logs and can be recovered from it. It will require quite some work to get it done if needed, but it means no data loss.
 
 I added acceptance tests for the _Custom domain_-feature that checks if both the endpoints are still working as expected. If they don't comply, I would get a phone call and a Telegram message.
 

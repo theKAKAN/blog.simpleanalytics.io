@@ -5,15 +5,21 @@ $background-color: #EEF9FF;
 $border-color: #CCDCE6;
 $breakpoint-medium: 768px;
 $breakpoint-small: 425px;
+$breakpoint-footer: 920px;
 $button-active-color: #E6475A;
 $button-color: #FF4F64;
 $graph-color: rgba(191, 237, 245, 0.5);
+$loading-color-light: rgba(191, 237, 245, 0.5);
+$loading-color-dark: rgb(191, 237, 245);
+$alert-color: rgb(221, 17, 68);
+$success-color: rgb(15, 142, 15);
 $icon-color: #9AA7B4;
 $link-active-color: #00B1CE;
 $link-color: #00C5E5;
 $primary-color: #FF4F64;
 $secondary-color: #00C5E5;
 $text-color: #415659;
+$text-muted: #777;
 
 @import "code.scss";
 @import "dashboard.scss";
@@ -21,10 +27,34 @@ $text-color: #415659;
 @import "helpers.scss";
 @import "homepage.scss";
 @import "layouts.scss";
-@import "navigation.scss";
+@import "header.scss";
+@import "footer.scss";
 @import "signup.scss";
 @import "stats.scss";
 @import "typography.scss";
+@import "highlighting.scss";
+
+.text-light {
+  font-weight: 100;
+}
+
+blockquote {
+  border-left: 5px solid #00C5E5;
+  padding-left: 1rem;
+  margin-left: 0;
+  margin-right: 0;
+  font-style: italic;
+  background-color: #EEF9FF;
+  border-radius: 3px;
+  padding: 0.5rem 1rem;
+
+  > p:first-of-type {
+    margin-top: 0;
+  }
+  > p:last-of-type {
+    margin-bottom: 0;
+  }
+}
 
 .text-light {
   font-weight: 100;
@@ -67,5 +97,15 @@ ul.related-posts {
       display: unset;
       margin: unset;
     }
+  }
+
+  img.border {
+    border: 1px solid $border-color;
+  }
+
+  .caption {
+    margin-top: -1.5rem;
+    font-size: 13px;
+    color: $text-muted;
   }
 }
